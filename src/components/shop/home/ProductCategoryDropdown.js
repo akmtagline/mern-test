@@ -102,6 +102,7 @@ const FilterAndSearch = () => {
 
   const handleMaxPriceChange = (e) => {
     const value = e.target.value;
+
     setMaxPrice(value);
     applyFilters(searchTitle, searchDescription, minPrice, value);
   };
@@ -148,27 +149,30 @@ const FilterAndSearch = () => {
   return (
     <div className={`${data.filterSearchDropdown ? "" : "hidden"} my-4`}>
       <hr />
-      <div className="w-full flex flex-col space-y-4 py-4">
-        {/* Search Section */}
-        <div className="flex items-center gap-2 md:gap-4">
-          <input
-            value={searchTitle}
-            onChange={searchByTitle}
-            className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-yellow-500 flex-1"
-            type="text"
-            placeholder="Search by title..."
-          />
-          <input
-            value={searchDescription}
-            onChange={searchByDescription}
-            className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-yellow-500 flex-1"
-            type="text"
-            placeholder="Search by description..."
-          />
+      <div className="w-full flex flex-col lg:flex-row lg:items-start gap-6 py-4">
+        <div className="flex flex-col">
+          <div className="font-medium py-2">
+            Search by title and description
+          </div>
+          <div className="flex items-center gap-2 md:gap-4">
+            <input
+              value={searchTitle}
+              onChange={searchByTitle}
+              className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-yellow-500 flex-1"
+              type="text"
+              placeholder="Search by title..."
+            />
+            <input
+              value={searchDescription}
+              onChange={searchByDescription}
+              className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-yellow-500 flex-1"
+              type="text"
+              placeholder="Search by description..."
+            />
+          </div>
         </div>
 
-        {/* Filter by Price Section */}
-        <div className="flex flex-col">
+        <div className="mb-auto flex flex-col">
           <div className="font-medium py-2">Filter by price range</div>
           <div className="flex items-center gap-2 md:gap-4">
             <input
@@ -178,6 +182,9 @@ const FilterAndSearch = () => {
               type="number"
               min="0"
               placeholder="Min Price ($)"
+              onKeyDown={(e) =>
+                (e.key === "-" || e.key === "e") && e.preventDefault()
+              }
             />
             <input
               value={maxPrice}
@@ -186,12 +193,14 @@ const FilterAndSearch = () => {
               type="number"
               min="0"
               placeholder="Max Price ($)"
+              onKeyDown={(e) =>
+                (e.key === "-" || e.key === "e") && e.preventDefault()
+              }
             />
           </div>
         </div>
 
-        {/* Close Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-end ml-auto">
           <div
             onClick={closePanel}
             className="cursor-pointer hover:bg-gray-200 rounded-full p-1"
