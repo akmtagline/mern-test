@@ -139,6 +139,12 @@ const FilterAndSearch = () => {
     setMaxPrice("");
   };
 
+  useEffect(() => {
+    if (!products) {
+      fetchProductData();
+    }
+  }, [products]);
+
   return (
     <div className={`${data.filterSearchDropdown ? "" : "hidden"} my-4`}>
       <hr />
