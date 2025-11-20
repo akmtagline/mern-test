@@ -2,7 +2,7 @@ import React, { Fragment, useContext, useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { HomeContext } from "./index";
 import { getAllCategory } from "../../admin/categories/FetchApi";
-import { getAllProduct, productByPrice } from "../../admin/products/FetchApi";
+import { getAllProduct } from "../../admin/products/FetchApi";
 import "./style.css";
 
 const apiURL = process.env.REACT_APP_API_URL;
@@ -62,17 +62,22 @@ const FilterAndSearch = () => {
   const { data, dispatch } = useContext(HomeContext);
   const [searchTitle, setSearchTitle] = useState("");
   const [searchDescription, setSearchDescription] = useState("");
-  const [range, setRange] = useState(0);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
   const [products, setProducts] = useState(null);
 
-  const handleSearchChange = (titleValue, descValue) => {
+  const applyFilters = (titleValue, descValue, minValue, maxValue) => {
     if (!products) {
       fetchProductData();
+      return;
     }
+
     dispatch({
-      type: "searchHandleInReducer",
+      type: "searchAndFilterProducts",
       titleSearch: titleValue,
       descSearch: descValue,
+      minPrice: minValue,
+      maxPrice: maxValue,
       productArray: products,
     });
   };
@@ -80,18 +85,25 @@ const FilterAndSearch = () => {
   const searchByTitle = (e) => {
     const value = e.target.value;
     setSearchTitle(value);
-    handleSearchChange(value, searchDescription);
+    applyFilters(value, searchDescription, minPrice, maxPrice);
   };
 
   const searchByDescription = (e) => {
     const value = e.target.value;
     setSearchDescription(value);
-    handleSearchChange(searchTitle, value);
+    applyFilters(searchTitle, value, minPrice, maxPrice);
   };
 
-  const handlePriceRangeChange = (e) => {
-    setRange(e.target.value);
-    fetchDataByPrice(e.target.value);
+  const handleMinPriceChange = (e) => {
+    const value = e.target.value;
+    setMinPrice(value);
+    applyFilters(searchTitle, searchDescription, value, maxPrice);
+  };
+
+  const handleMaxPriceChange = (e) => {
+    const value = e.target.value;
+    setMaxPrice(value);
+    applyFilters(searchTitle, searchDescription, minPrice, value);
   };
 
   const fetchProductData = async () => {
@@ -102,6 +114,7 @@ const FilterAndSearch = () => {
         let response = await getAllProduct();
         if (response && response.Products) {
           setProducts(response.Products);
+          dispatch({ type: "setProducts", payload: response.Products });
           dispatch({ type: "loading", payload: false });
         }
       }, 700);
@@ -110,43 +123,20 @@ const FilterAndSearch = () => {
     }
   };
 
-  const fetchDataByPrice = async (price) => {
-    if (price === "all") {
-      try {
-        let responseData = await getAllProduct();
-        if (responseData && responseData.Products) {
-          dispatch({ type: "setProducts", payload: responseData.Products });
-          setProducts(responseData.Products);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      dispatch({ type: "loading", payload: true });
-      try {
-        setTimeout(async () => {
-          let responseData = await productByPrice(price);
-          if (responseData && responseData.Products) {
-            dispatch({ type: "setProducts", payload: responseData.Products });
-            setProducts(responseData.Products);
-            dispatch({ type: "loading", payload: false });
-          }
-        }, 700);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-
   const closePanel = () => {
-    fetchDataByPrice("all");
+    // Reset products
+    if (products) {
+      dispatch({ type: "setProducts", payload: products });
+    }
+
     dispatch({
       type: "filterSearchDropdown",
       payload: !data.filterSearchDropdown,
     });
     setSearchTitle("");
     setSearchDescription("");
-    setRange(0);
+    setMinPrice("");
+    setMaxPrice("");
   };
 
   return (
@@ -173,26 +163,24 @@ const FilterAndSearch = () => {
 
         {/* Filter by Price Section */}
         <div className="flex flex-col">
-          <div className="font-medium py-2">Filter by price</div>
-          <div className="flex justify-between items-center">
-            <div className="flex flex-col space-y-2 w-full">
-              <label htmlFor="points" className="text-sm">
-                Price (between 0 and 1000$):{" "}
-                <span className="font-semibold text-yellow-700">
-                  {range}.00$
-                </span>
-              </label>
-              <input
-                value={range}
-                className="slider"
-                type="range"
-                id="points"
-                min="0"
-                max="1000"
-                step="10"
-                onChange={handlePriceRangeChange}
-              />
-            </div>
+          <div className="font-medium py-2">Filter by price range</div>
+          <div className="flex items-center gap-2 md:gap-4">
+            <input
+              value={minPrice}
+              onChange={handleMinPriceChange}
+              className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-yellow-500 flex-1"
+              type="number"
+              min="0"
+              placeholder="Min Price ($)"
+            />
+            <input
+              value={maxPrice}
+              onChange={handleMaxPriceChange}
+              className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-yellow-500 flex-1"
+              type="number"
+              min="0"
+              placeholder="Max Price ($)"
+            />
           </div>
         </div>
 

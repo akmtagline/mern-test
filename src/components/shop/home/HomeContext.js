@@ -25,7 +25,7 @@ export const homeReducer = (state, action) => {
         ...state,
         products: action.payload,
       };
-    case "searchHandleInReducer":
+    case "searchAndFilterProducts":
       return {
         ...state,
         products:
@@ -33,6 +33,8 @@ export const homeReducer = (state, action) => {
           action.productArray.filter((item) => {
             const titleSearch = action.titleSearch || "";
             const descSearch = action.descSearch || "";
+            const minValue = action.minPrice || "";
+            const maxValue = action.maxPrice || "";
 
             const matchTitle =
               !titleSearch ||
@@ -44,7 +46,11 @@ export const homeReducer = (state, action) => {
                 .toUpperCase()
                 .indexOf(descSearch.toUpperCase()) !== -1;
 
-            return matchTitle && matchDesc;
+            // Price range filters
+            const matchMinPrice = !minValue || item.pPrice >= Number(minValue);
+            const matchMaxPrice = !maxValue || item.pPrice <= Number(maxValue);
+
+            return matchTitle && matchDesc && matchMinPrice && matchMaxPrice;
           }),
       };
     case "loading":
