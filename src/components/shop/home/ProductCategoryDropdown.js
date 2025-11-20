@@ -60,18 +60,33 @@ const CategoryList = () => {
 
 const FilterAndSearch = () => {
   const { data, dispatch } = useContext(HomeContext);
-  const [search, setSearch] = useState("");
+  const [searchTitle, setSearchTitle] = useState("");
+  const [searchDescription, setSearchDescription] = useState("");
   const [range, setRange] = useState(0);
   const [products, setProducts] = useState(null);
 
-  const searchProducts = (e) => {
-    setSearch(e.target.value);
-    fetchProductData();
+  const handleSearchChange = (titleValue, descValue) => {
+    if (!products) {
+      fetchProductData();
+    }
     dispatch({
       type: "searchHandleInReducer",
-      payload: e.target.value,
+      titleSearch: titleValue,
+      descSearch: descValue,
       productArray: products,
     });
+  };
+
+  const searchByTitle = (e) => {
+    const value = e.target.value;
+    setSearchTitle(value);
+    handleSearchChange(value, searchDescription);
+  };
+
+  const searchByDescription = (e) => {
+    const value = e.target.value;
+    setSearchDescription(value);
+    handleSearchChange(searchTitle, value);
   };
 
   const handlePriceRangeChange = (e) => {
@@ -129,7 +144,8 @@ const FilterAndSearch = () => {
       type: "filterSearchDropdown",
       payload: !data.filterSearchDropdown,
     });
-    setSearch("");
+    setSearchTitle("");
+    setSearchDescription("");
     setRange(0);
   };
 
@@ -138,13 +154,20 @@ const FilterAndSearch = () => {
       <hr />
       <div className="w-full flex flex-col space-y-4 py-4">
         {/* Search Section */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 md:gap-4">
           <input
-            value={search}
-            onChange={searchProducts}
+            value={searchTitle}
+            onChange={searchByTitle}
             className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-yellow-500 flex-1"
             type="text"
-            placeholder="Search products..."
+            placeholder="Search by title..."
+          />
+          <input
+            value={searchDescription}
+            onChange={searchByDescription}
+            className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-yellow-500 flex-1"
+            type="text"
+            placeholder="Search by description..."
           />
         </div>
 

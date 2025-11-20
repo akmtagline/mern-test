@@ -31,13 +31,20 @@ export const homeReducer = (state, action) => {
         products:
           action.productArray &&
           action.productArray.filter((item) => {
-            if (
-              item.pName.toUpperCase().indexOf(action.payload.toUpperCase()) !==
-              -1
-            ) {
-              return item;
-            }
-            return null;
+            const titleSearch = action.titleSearch || "";
+            const descSearch = action.descSearch || "";
+
+            const matchTitle =
+              !titleSearch ||
+              item.pName.toUpperCase().indexOf(titleSearch.toUpperCase()) !==
+                -1;
+            const matchDesc =
+              !descSearch ||
+              item.pDescription
+                .toUpperCase()
+                .indexOf(descSearch.toUpperCase()) !== -1;
+
+            return matchTitle && matchDesc;
           }),
       };
     case "loading":
