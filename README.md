@@ -1,8 +1,8 @@
-# Project Demo
+# Test Task Implementation
 
-This is a test project for full stack developers
+This repo contains the implementation of the requirements mentioned below.
 
-## Getting Started
+## Requirements
 
 Design and implement a small, self‑contained enhancement to this app to demonstrate full‑stack skills, code quality, and UX judgment. Keep scope tight; prefer clear, well‑tested code over breadth.
 
